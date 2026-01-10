@@ -1,98 +1,98 @@
-🫀 Heart Disease Prediction using Machine Learning
+# 🫀 Heart Disease Prediction using Machine Learning
 
 This project focuses on predicting the presence of heart disease in patients using various machine learning algorithms. The model is trained on a clinical dataset containing demographic and medical attributes and compares the performance of multiple classification techniques.
 
-📌 Project Overview
+## 📌 Project Overview
 
 Heart disease is one of the leading causes of mortality worldwide. Early prediction can help in timely diagnosis and treatment.
 This project uses machine learning models to classify whether a patient is likely to have heart disease based on medical parameters.
 
-📊 Dataset
+## 📊 Dataset
 
-Source: Heart Disease Dataset
+- Source: Heart Disease Dataset
 
-Number of features: 11
+- Number of features: 11
 
-Target variable: HeartDisease
+- Target variable: HeartDisease
 
-1 → Presence of heart disease
+   - 1 → Presence of heart disease
 
-0 → No heart disease
+   - 0 → No heart disease
 
-Features include:
+- Features include:
 
-Age
+  - Age
 
-Sex
+  - Sex
 
-Chest Pain Type
+  - Chest Pain Type
 
-Resting Blood Pressure
+  - Resting Blood Pressure
 
-Cholesterol
+  - Cholesterol
 
-Fasting Blood Sugar
+  - Fasting Blood Sugar
 
-Resting ECG
+  - Resting ECG
 
-Maximum Heart Rate
+  - Maximum Heart Rate
 
-Exercise-Induced Angina
+  - Exercise-Induced Angina
 
-Oldpeak
+  - Oldpeak
 
-ST Slope
+  - ST Slope
 
-⚙️ Technologies Used
+## ⚙️ Technologies Used
 
-Python
+- Python
 
-Pandas, NumPy
+- Pandas, NumPy
 
-Matplotlib, Seaborn
+- Matplotlib, Seaborn
 
-Scikit-learn
+- Scikit-learn
 
-🔍 Exploratory Data Analysis (EDA)
+## 🔍 Exploratory Data Analysis (EDA)
 
-Distribution analysis of the target variable
+- Distribution analysis of the target variable
 
-Analysis of categorical features like sex, chest pain type, and exercise-induced angina
+- Analysis of categorical features like sex, chest pain type, and exercise-induced angina
 
-Correlation analysis to understand feature relationships
+- Correlation analysis to understand feature relationships
 
-🧠 Machine Learning Models Implemented
+## 🧠 Machine Learning Models Implemented
 
-Logistic Regression
+- Logistic Regression
 
-Naive Bayes
+- Naive Bayes
 
-Support Vector Machine (SVM)
+- Support Vector Machine (SVM)
 
-K-Nearest Neighbors (KNN)
+- K-Nearest Neighbors (KNN)
 
-Decision Tree
+- Decision Tree
 
-Random Forest
+- Random Forest
 
-XGBoost (optional, environment dependent)
+- XGBoost (optional, environment dependent)
 
-Neural Network (skipped due to TensorFlow compatibility)
+- Neural Network (skipped due to TensorFlow compatibility)
 
-📈 Model Evaluation
+## 📈 Model Evaluation
 
-Train-test split (80:20)
+- Train-test split (80:20)
 
-Accuracy score comparison
+- Accuracy score comparison
 
-Confusion matrix analysis
+- Confusion matrix analysis
 
-Visualization of model accuracies using bar plots
+- Visualization of model accuracies using bar plots
 
-🏆 Results
+## 🏆 Results
 
 Among all the models tested, Random Forest achieved the highest accuracy, demonstrating strong performance in predicting heart disease compared to other algorithms.
 
-📌 Conclusion
+## 📌 Conclusion
 
 The project demonstrates that machine learning can effectively assist in predicting heart disease using clinical data. Ensemble models like Random Forest provided better accuracy due to their ability to capture complex patterns. This system can serve as a decision-support tool for healthcare professionals.
