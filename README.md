@@ -2,8 +2,9 @@
 
 This project focuses on predicting the presence of heart disease in patients using various machine learning algorithms. The model is trained on a clinical dataset containing demographic and medical attributes and compares the performance of multiple classification techniques.
 
-## 🚀 Live Website
-[![Heart_disease_Prediction](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://heart-disease-prediction-orcin.vercel.app/)
+# 🫀 Heart Disease Prediction
+
+> **Live Link:** [View the deployed application here](https://heart-disease-prediction-orcin.vercel.app/)
 
 ## 📌 Project Overview
 
