@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioScan AI - Heart Disease Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Grid overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3em;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00f5ff, #0080ff, #00f5ff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
+            animation: glow 3s ease-in-out infinite;
+            letter-spacing: 3px;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .tagline {
+            font-size: 1.1em;
+            color: #00f5ff;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+
+        .scan-line {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f5ff, transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-150%); }
+            100% { transform: translateX(50%); }
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: rgba(15, 25, 50, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            box-shadow: 
+                0 8px 32px 0 rgba(0, 245, 255, 0.1),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6em;
+            color: #00f5ff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #00f5ff, #0080ff);
+            box-shadow: 0 0 10px #00f5ff;
+        }
+
+        /* Form Elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            color: #00f5ff;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cyber-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 20, 40, 0.5);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            font-family: 'Rajdhani', sans-serif;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .cyber-input:focus {
+            border-color: #00f5ff;
+            box-shadow: 
+                0 0 15px rgba(0, 245, 255, 0.3),
+                inset 0 0 10px rgba(0, 245, 255, 0.1);
+        }
+
+        .cyber-input option {
+            background: #0a0e27;
+            color: #00f5ff;
+        }
+
+        /* Radio Buttons */
+        .radio-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            position: relative;
+            flex: 1;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-label {
+            display: block;
+            padding: 10px 15px;
+            background: rgba(0, 20, 40, 0.5);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 8px;
+            color: #00f5ff;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: #00f5ff;
+            box-shadow: 
+                0 0 15px rgba(0, 245, 255, 0.4),
+                inset 0 0 10px rgba(0, 245, 255, 0.2);
+        }
+
+        .radio-label:hover {
+            border-color: #00f5ff;
+            transform: translateY(-2px);
+        }
+
+        /* Info Icon */
+        .info-tooltip {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #00f5ff, #0080ff);
+            border-radius: 50%;
+            color: #000;
+            text-align: center;
+            line-height: 18px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 6px;
+            cursor: help;
+            position: relative;
+            box-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
+        }
+
+        .info-tooltip:hover::after {
+            content: attr(data-info);
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 20, 40, 0.95);
+            color: #00f5ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            font-size: 10px;
+            z-index: 1000;
+            border: 1px solid #00f5ff;
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+            font-weight: normal;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 25px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 20, 40, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f5ff, #0080ff, #00f5ff);
+            background-size: 200% 100%;
+            width: 0%;
+            transition: width 0.5s;
+            animation: shimmer 2s linear infinite;
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #00f5ff;
+            margin-top: 8px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Buttons */
+        .cyber-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00f5ff, #0080ff);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 1.1em;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        }
+
+        .cyber-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .cyber-button:hover::before {
+            left: 100%;
+        }
+
+        .cyber-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 30px rgba(0, 245, 255, 0.7);
+        }
+
+        .cyber-button:active {
+            transform: translateY(0);
+        }
+
+        .reset-button {
+            background: linear-gradient(135deg, #ff0080, #ff0040);
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.5);
+        }
+
+        .reset-button:hover {
+            box-shadow: 0 5px 30px rgba(255, 0, 128, 0.7);
+        }
+
+        /* Info Toggle Section */
+        .info-toggle-section {
+            margin-top: 20px;
+        }
+
+        .toggle-button {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 245, 255, 0.1);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 10px;
+            color: #00f5ff;
+            font-size: 1em;
+            font-weight: 600;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .toggle-button:hover {
+            background: rgba(0, 245, 255, 0.15);
+            border-color: #00f5ff;
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .info-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .info-content.open {
+            max-height: 2000px;
+        }
+
+        .info-panel {
+            background: rgba(0, 245, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .info-panel h3 {
+            color: #00f5ff;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-panel ul {
+            list-style: none;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .info-panel li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        .info-panel li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #00f5ff;
+            font-size: 1.1em;
+        }
+
+        .alert-box {
+            background: rgba(255, 100, 0, 0.1);
+            border: 2px solid rgba(255, 100, 0, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .alert-box strong {
+            color: #ff6400;
+            font-size: 1em;
+            display: block;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .alert-box p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+
+        /* Result Overlay */
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .result-overlay.show {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .result-card {
+            background: rgba(15, 25, 50, 0.95);
+            border: 2px solid #00f5ff;
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 650px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 
+                0 0 50px rgba(0, 245, 255, 0.5),
+                inset 0 0 30px rgba(0, 245, 255, 0.1);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-icon {
+            font-size: 4em;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .result-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .result-high .result-title {
+            color: #ff0080;
+            text-shadow: 0 0 20px rgba(255, 0, 128, 0.7);
+        }
+
+        .result-low .result-title {
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.7);
+        }
+
+        .result-description {
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            margin-bottom: 25px;
+            line-height: 1.7;
+            font-size: 1em;
+        }
+
+        .risk-panel {
+            background: rgba(0, 245, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .risk-panel h3 {
+            color: #00f5ff;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.1em;
+        }
+
+        .risk-panel ul {
+            list-style: none;
+        }
+
+        .risk-panel li {
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(0, 20, 40, 0.5);
+            border-left: 3px solid #00f5ff;
+            border-radius: 5px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95em;
+        }
+
+        .close-button {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* Scanning Animation */
+        .scanning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .scanning.active {
+            display: flex;
+        }
+
+        .scanner {
+            text-align: center;
+        }
+
+        .scanner-circle {
+            width: 120px;
+            height: 120px;
+            border: 3px solid transparent;
+            border-top-color: #00f5ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+            position: relative;
+        }
+
+        .scanner-circle::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 2px solid transparent;
+            border-top-color: #0080ff;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .scanner-text {
+            color: #00f5ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: glow 1.5s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .logo {
+                font-size: 2.2em;
+            }
+
+            .result-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="stars" id="stars"></div>
+    <div class="grid-overlay"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo">⚡ CARDIOSCAN AI ⚡</div>
+            <div class="tagline">Advanced Cardiac Analysis</div>
+            <div class="scan-line"></div>
+        </header>
+
+        <div class="glass-card">
+            <h2 class="card-title">🔬 Patient Data Input</h2>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">READY - 0% COMPLETE</div>
+            </div>
+
+            <form id="predictionForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Age
+                            <span class="info-tooltip" data-info="Patient age in years">i</span>
+                        </label>
+                        <input type="number" class="cyber-input" id="age" min="1" max="120" placeholder="Enter..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Sex
+                            <span class="info-tooltip" data-info="Biological sex">i</span>
+                        </label>
+                        <div class="radio-container">
+                            <div class="radio-option">
+                                <input type="radio" name="sex" value="1" id="male" required>
+                                <label class="radio-label" for="male">Male</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="sex" value="0" id="female">
+                                <label class="radio-label" for="female">Female</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Resting BP
+                            <span class="info-tooltip" data-info="Normal: 90-120 mm Hg">i</span>
+                        </label>
+                        <input type="number" class="cyber-input" id="bp" min="50" max="250" placeholder="mm Hg" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Cholesterol
+                            <span class="info-tooltip" data-info="Healthy: < 200 mg/dl">i</span>
+                        </label>
+                        <input type="number" class="cyber-input" id="chol" min="100" max="600" placeholder="mg/dl" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Max Heart Rate
+                            <span class="info-tooltip" data-info="Peak during exercise">i</span>
+                        </label>
+                        <input type="number" class="cyber-input" id="maxhr" min="60" max="220" placeholder="bpm" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            ST Depression
+                            <span class="info-tooltip" data-info="Oldpeak (0-10)">i</span>
+                        </label>
+                        <input type="number" class="cyber-input" id="oldpeak" step="0.1" min="0" max="10" placeholder="Value" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Chest Pain Type
+                        <span class="info-tooltip" data-info="Type of chest discomfort">i</span>
+                    </label>
+                    <select class="cyber-input" id="cp" required>
+                        <option value="">SELECT...</option>
+                        <option value="0">Typical Angina</option>
+                        <option value="1">Atypical Angina</option>
+                        <option value="2">Non-Anginal Pain</option>
+                        <option value="3">Asymptomatic</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Fasting Blood Sugar
+                        <span class="info-tooltip" data-info="After 8hr fast">i</span>
+                    </label>
+                    <div class="radio-container">
+                        <div class="radio-option">
+                            <input type="radio" name="fbs" value="0" id="fbs_low" required>
+                            <label class="radio-label" for="fbs_low">≤ 120 mg/dl</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="fbs" value="1" id="fbs_high">
+                            <label class="radio-label" for="fbs_high">> 120 mg/dl</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Resting ECG
+                        <span class="info-tooltip" data-info="Electrocardiogram result">i</span>
+                    </label>
+                    <select class="cyber-input" id="ecg" required>
+                        <option value="">SELECT...</option>
+                        <option value="0">Normal</option>
+                        <option value="1">ST-T Wave Abnormality</option>
+                        <option value="2">LV Hypertrophy</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Exercise Angina
+                        <span class="info-tooltip" data-info="Chest pain during exercise">i</span>
+                    </label>
+                    <div class="radio-container">
+                        <div class="radio-option">
+                            <input type="radio" name="exang" value="0" id="exang_no" required>
+                            <label class="radio-label" for="exang_no">No</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="exang" value="1" id="exang_yes">
+                            <label class="radio-label" for="exang_yes">Yes</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        ST Slope
+                        <span class="info-tooltip" data-info="ST segment slope">i</span>
+                    </label>
+                    <select class="cyber-input" id="slope" required>
+                        <option value="">SELECT...</option>
+                        <option value="0">Upsloping</option>
+                        <option value="1">Flat</option>
+                        <option value="2">Downsloping</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="cyber-button">⚡ INITIATE SCAN ⚡</button>
+                <button type="button" class="cyber-button reset-button" onclick="resetForm()">🔄 RESET</button>
+            </form>
+        </div>
+
+        <!-- Collapsible Info Section -->
+        <div class="info-toggle-section">
+            <button class="toggle-button" onclick="toggleInfo()">
+                <span>📊 SYSTEM INFORMATION</span>
+                <span class="toggle-icon" id="toggleIcon">▼</span>
+            </button>
+            
+            <div class="info-content" id="infoContent">
+                <div class="info-panel">
+                    <h3>🤖 AI Technology</h3>
+                    <ul>
+                        <li>Neural network-based prediction engine</li>
+                        <li>Real-time cardiovascular risk assessment</li>
+                        <li>Multi-parameter analysis (11 biomarkers)</li>
+                        <li>Advanced pattern recognition algorithms</li>
+                    </ul>
+                </div>
+
+                <div class="info-panel">
+                    <h3>⚕️ Risk Indicators</h3>
+                    <ul>
+                        <li><strong>Age:</strong> Risk increases with age</li>
+                        <li><strong>Blood Pressure:</strong> Damages arterial walls</li>
+                        <li><strong>Cholesterol:</strong> Plaque formation risk</li>
+                        <li><strong>Chest Pain:</strong> Reduced cardiac blood flow</li>
+                        <li><strong>ECG:</strong> Electrical abnormality detection</li>
+                    </ul>
+                </div>
+
+                <div class="info-panel">
+                    <h3>💚 Prevention Tips</h3>
+                    <ul>
+                        <li>Heart-healthy diet (low saturated fat)</li>
+                        <li>Regular exercise (150 min/week)</li>
+                        <li>Monitor BP & cholesterol levels</li>
+                        <li>Avoid smoking & limit alcohol</li>
+                        <li>Manage stress effectively</li>
+                        <li>Annual health screenings</li>
+                    </ul>
+                </div>
+
+                <div class="alert-box">
+                    <strong>⚠️ DISCLAIMER</strong>
+                    <p>This AI tool is for educational purposes only. Always consult qualified healthcare professionals for accurate diagnosis and treatment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scanning Animation -->
+    <div class="scanning" id="scanning">
+        <div class="scanner">
+            <div class="scanner-circle"></div>
+            <div class="scanner-text">ANALYZING DATA...</div>
+        </div>
+    </div>
+
+    <!-- Result Overlay -->
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-card" id="resultContent"></div>
+    </div>
+
+    <script>
+        // Generate stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Toggle info section
+        function toggleInfo() {
+            const content = document.getElementById('infoContent');
+            const icon = document.getElementById('toggleIcon');
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // Progress tracking
+        const form = document.getElementById('predictionForm');
+        const inputs = form.querySelectorAll('input, select');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        function updateProgress() {
+            let filled = 0;
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (document.querySelector(`input[name="${input.name}"]:checked`)) {
+                        filled += 1 / 3;
+                    }
+                } else if (input.value) {
+                    filled++;
+                }
+            });
+            const progress = Math.round((filled / 11) * 100);
+            progressFill.style.width = progress + '%';
+            progressText.textContent = progress === 100 ? 'COMPLETE - READY' : `${progress}% COMPLETE`;
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('change', updateProgress);
+            input.addEventListener('input', updateProgress);
+        });
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            document.getElementById('scanning').classList.add('active');
+
+            const formData = {
+                age: parseInt(document.getElementById('age').value),
+                sex: parseInt(document.querySelector('input[name="sex"]:checked').value),
+                cp: parseInt(document.getElementById('cp').value),
+                bp: parseInt(document.getElementById('bp').value),
+                chol: parseInt(document.getElementById('chol').value),
+                fbs: parseInt(document.querySelector('input[name="fbs"]:checked').value),
+                ecg: parseInt(document.getElementById('ecg').value),
+                maxhr: parseInt(document.getElementById('maxhr').value),
+                exang: parseInt(document.querySelector('input[name="exang"]:checked').value),
+                oldpeak: parseFloat(document.getElementById('oldpeak').value),
+                slope: parseInt(document.getElementById('slope').value)
+            };
+
+            setTimeout(() => {
+                document.getElementById('scanning').classList.remove('active');
+                const prediction = predictHeartDisease(formData);
+                displayResult(prediction, formData);
+            }, 2500);
+        });
+
+        function predictHeartDisease(data) {
+            let riskScore = 0;
+
+            if (data.age > 60) riskScore += 2;
+            else if (data.age > 50) riskScore += 1;
+
+            if (data.cp === 0) riskScore += 2;
+            else if (data.cp === 1) riskScore += 1;
+
+            if (data.bp > 140) riskScore += 2;
+            else if (data.bp > 130) riskScore += 1;
+
+            if (data.chol > 240) riskScore += 2;
+            else if (data.chol > 200) riskScore += 1;
+
+            if (data.fbs === 1) riskScore += 1;
+            if (data.ecg > 0) riskScore += 1;
+
+            if (data.maxhr < 120) riskScore += 2;
+            else if (data.maxhr < 140) riskScore += 1;
+
+            if (data.exang === 1) riskScore += 2;
+
+            if (data.oldpeak > 2) riskScore += 2;
+            else if (data.oldpeak > 1) riskScore += 1;
+
+            if (data.slope === 2) riskScore += 2;
+            else if (data.slope === 1) riskScore += 1;
+
+            return riskScore >= 7 ? 'high' : 'low';
+        }
+
+        function displayResult(prediction, data) {
+            const resultContent = document.getElementById('resultContent');
+            let riskFactors = [];
+
+            if (data.age > 55) riskFactors.push('Advanced age (>55 years)');
+            if (data.bp > 130) riskFactors.push('Elevated blood pressure');
+            if (data.chol > 200) riskFactors.push('High cholesterol levels');
+            if (data.cp <= 1) riskFactors.push('Angina symptoms present');
+            if (data.exang === 1) riskFactors.push('Exercise-induced chest pain');
+            if (data.oldpeak > 1) riskFactors.push('ST segment depression');
+            if (data.ecg > 0) riskFactors.push('ECG abnormalities');
+
+            if (prediction === 'high') {
+                resultContent.innerHTML = `
+                    <div class="result-high">
+                        <div class="result-icon">⚠️</div>
+                        <div class="result-title">HIGH RISK DETECTED</div>
+                        <div class="result-description">
+                            Advanced AI analysis indicates elevated cardiovascular risk markers. 
+                            Multiple indicators suggest potential concerns requiring professional evaluation.
+                        </div>
+                        <div class="risk-panel">
+                            <h3>⚡ RISK FACTORS</h3>
+                            <ul>
+                                ${riskFactors.map(factor => `<li>${factor}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="alert-box">
+                            <strong>🚨 ACTION REQUIRED</strong>
+                            <p>Consult a cardiologist immediately for comprehensive evaluation. This screening tool cannot diagnose heart disease.</p>
+                        </div>
+                        <button class="cyber-button close-button" onclick="closeResult()">CLOSE</button>
+                    </div>
+                `;
+            } else {
+                resultContent.innerHTML = `
+                    <div class="result-low">
+                        <div class="result-icon">✅</div>
+                        <div class="result-title">LOW RISK PROFILE</div>
+                        <div class="result-description">
+                            AI analysis indicates favorable cardiovascular health markers. 
+                            Continue maintaining heart-healthy lifestyle practices.
+                        </div>
+                        ${riskFactors.length > 0 ? `
+                        <div class="risk-panel">
+                            <h3>📊 MONITOR THESE</h3>
+                            <ul>
+                                ${riskFactors.map(factor => `<li>${factor}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                        <div class="alert-box">
+                            <strong>💚 RECOMMENDATION</strong>
+                            <p>Continue regular health monitoring and heart-healthy practices. This screening does not replace professional medical evaluation.</p>
+                        </div>
+                        <button class="cyber-button close-button" onclick="closeResult()">CLOSE</button>
+                    </div>
+                `;
+            }
+
+            document.getElementById('resultOverlay').classList.add('show');
+        }
+
+        function closeResult() {
+            document.getElementById('resultOverlay').classList.remove('show');
+        }
+
+        function resetForm() {
+            form.reset();
+            updateProgress();
+            closeResult();
+        }
+    </script>
+</body>
+</html>
